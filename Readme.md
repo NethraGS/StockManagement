@@ -2,7 +2,7 @@
 # 📊 Stock Portfolio Management System
 
 A modern web application to manage, track, and analyze your stock investments efficiently.  
-Built to help users monitor their portfolio performance, manage transactions, and make informed investment decisions.
+Built to help users monitor their portfolio performance, manage transactions, and make informed investment decision.
 
 ---
 
