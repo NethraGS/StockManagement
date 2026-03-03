@@ -39,6 +39,16 @@ const HeroSection: React.FC = () => {
                   Explore Markets <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
+              <Button variant="hero-outline" size="lg" asChild>
+                <Link to="/calculators">
+                  <Calculator className="h-4 w-4" /> Try Calculators
+                </Link>
+              </Button>
+              <Button variant="glass" size="lg" asChild>
+                <Link to="/education">
+                  <GraduationCap className="h-4 w-4" /> Start Learning
+                </Link>
+              </Button>
             </div>
           </motion.div>
 
