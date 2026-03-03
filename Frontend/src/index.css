@@ -96,13 +96,19 @@
     background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(171 77% 48% / 0.15), transparent);
   }
 
-  .ticker-scroll {
-    animation: ticker 30s linear infinite;
+  /* ── Infinite marquee ─────────────────────────────────── */
+  .marquee-track {
+    animation: marquee 7s linear infinite;
+    will-change: transform;
   }
 
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); }
   }
 
   .sparkline-up {
@@ -111,5 +117,24 @@
 
   .sparkline-down {
     stroke: hsl(0 84% 60%);
+  }
+
+  /* ── Price flash animations ─────────────────────────── */
+  @keyframes flash-green {
+    0%   { background-color: hsl(142 71% 45% / 0.25); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes flash-red {
+    0%   { background-color: hsl(0 84% 60% / 0.25); }
+    100% { background-color: transparent; }
+  }
+
+  .animate-flash-green {
+    animation: flash-green 0.8s ease-out;
+  }
+
+  .animate-flash-red {
+    animation: flash-red 0.8s ease-out;
   }
 }

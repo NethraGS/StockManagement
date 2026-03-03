@@ -1,205 +1,117 @@
 import React from "react";
-import HeroSection from "@/components/HeroSection";
 import MarketTicker from "@/components/MarketTicker";
+import FeatureCard from "@/components/FeatureCard";
+import type { FeatureCardProps } from "@/components/FeatureCard";
 import { motion } from "framer-motion";
-import { MOCK_CRYPTO, MOCK_COMMODITIES, EDUCATION_TOPICS } from "@/data/mockData";
-import Sparkline from "@/components/Sparkline";
-import { Link } from "react-router-dom";
-import { ArrowRight, Bitcoin, Gem, GraduationCap, Briefcase, Brain, Newspaper, BarChart3, Settings, Grid, Calculator } from "lucide-react";
-import FeatureCard from "@/components/ui/FeatureCard";
-import { Button } from "@/components/ui/button";
+import {
+  BarChart3,
+  Bitcoin,
+  PieChart,
+  Gem,
+  GraduationCap,
+  Calculator,
+  Newspaper,
+  Brain,
+  TrendingUp,
+} from "lucide-react";
+
+const features: Omit<FeatureCardProps, "index">[] = [
+  {
+    icon: BarChart3,
+    title: "Indices",
+    description: "Track real-time stock market indices like Nifty 50, Sensex, and global benchmarks.",
+    path: "/indices",
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    icon: TrendingUp,
+    title: "Futures & Options",
+    description: "Explore F&O data with open interest, option chains, and strategy tools.",
+    path: "/fno",
+    gradient: "from-violet-500 to-purple-500",
+  },
+  {
+    icon: Bitcoin,
+    title: "Crypto",
+    description: "Monitor top cryptocurrencies — prices, charts, and market cap rankings.",
+    path: "/crypto",
+    gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    icon: PieChart,
+    title: "Mutual Funds",
+    description: "Compare, analyse and track mutual fund performance across categories.",
+    path: "/mutual-funds",
+    gradient: "from-emerald-500 to-green-500",
+  },
+  {
+    icon: Gem,
+    title: "Commodities",
+    description: "Follow gold, silver, crude oil, and other commodity prices in real time.",
+    path: "/commodities",
+    gradient: "from-yellow-500 to-amber-500",
+  },
+  {
+    icon: GraduationCap,
+    title: "Learn & Educate",
+    description: "Beginner-friendly courses on investing, trading, and personal finance.",
+    path: "/education",
+    gradient: "from-pink-500 to-rose-500",
+  },
+  {
+    icon: Calculator,
+    title: "Calculators",
+    description: "SIP, EMI, CAGR and more — plan your finances with powerful calculators.",
+    path: "/calculators",
+    gradient: "from-teal-500 to-cyan-500",
+  },
+  {
+    icon: Newspaper,
+    title: "News",
+    description: "Stay updated with curated financial news and market-moving headlines.",
+    path: "/news",
+    gradient: "from-sky-500 to-blue-500",
+  },
+  {
+    icon: Brain,
+    title: "Predict Now",
+    description: "AI-powered market predictions and sentiment analysis at your fingertips.",
+    path: "/predict",
+    gradient: "from-fuchsia-500 to-purple-500",
+  },
+];
 
 const Index = () => {
   return (
     <div className="min-h-screen">
+      {/* Live market ticker */}
       <MarketTicker />
-      <HeroSection />
 
-      {/* Features Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <h2 className="font-display text-2xl font-bold text-foreground mb-4">Explore</h2>
-        <p className="text-sm text-muted-foreground mb-6">Quick access to core features</p>
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          <FeatureCard
-            to="/portfolio"
-            title="Portfolio"
-            description="View and manage your investments"
-            icon={<Briefcase className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/predict"
-            title="Predict"
-            description="Run predictions and models"
-            icon={<Brain className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/indices"
-            title="Indices"
-            description="Major market indices and movements"
-            icon={<BarChart3 className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/news"
-            title="News"
-            description="Latest market headlines"
-            icon={<Newspaper className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/analytics"
-            title="Analytics"
-            description="Charts, metrics and insights"
-            icon={<BarChart3 className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/dashboard"
-            title="Dashboard"
-            description="Overview of your activity"
-            icon={<Grid className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/settings"
-            title="Settings"
-            description="Account and app preferences"
-            icon={<Settings className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/calculators"
-            title="Calculators"
-            description="Financial planning tools and calculators"
-            icon={<Calculator className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/learning"
-            title="Learning"
-            description="Courses, tutorials, and market education"
-            icon={<GraduationCap className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/crypto"
-            title="Crypto"
-            description="Track cryptocurrencies"
-            icon={<Bitcoin className="h-5 w-5" />}
-          />
-          <FeatureCard
-            to="/commodities"
-            title="Commodities"
-            description="Gold, silver, oil & more"
-            icon={<Gem className="h-5 w-5" />}
-          />
+      {/* Compact Hero */}
+      <section className="relative overflow-hidden">
+        <div className="hero-glow absolute inset-0" />
+        <div className="mx-auto max-w-7xl px-4 py-14 md:py-20 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
+              <div className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse" />
+              <span className="text-xs font-medium text-primary">Markets are live</span>
+            </div>
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+              <span className="text-foreground">Your All-in-One</span>{" "}
+              <span className="gradient-text">Wealth Dashboard</span>
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg leading-relaxed">
+              Market insights, financial education, and smart investment tools — everything you need in one place.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Quick Crypto Section */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-foreground">Crypto Markets</h2>
-            <p className="text-sm text-muted-foreground mt-1">Top cryptocurrencies by market cap</p>
-          </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/crypto">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
-          </Button>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {MOCK_CRYPTO.slice(0, 4).map((coin, i) => (
-            <motion.div
-              key={coin.symbol}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="glass-card-hover p-4"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-chart-3/10">
-                    <Bitcoin className="h-4 w-4 text-chart-3" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{coin.name}</p>
-                    <p className="text-xs text-muted-foreground">{coin.symbol}</p>
-                  </div>
-                </div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${coin.change >= 0 ? "bg-gain/10 text-gain" : "bg-loss/10 text-loss"}`}>
-                  {coin.change >= 0 ? "+" : ""}{coin.change}%
-                </span>
-              </div>
-              <div className="flex items-end justify-between">
-                <p className="text-lg font-bold text-foreground">${coin.price.toLocaleString()}</p>
-                <Sparkline data={coin.data} positive={coin.change >= 0} width={60} height={24} />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Commodities Strip */}
-      <section className="mx-auto max-w-7xl px-4 pb-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-foreground">Commodities</h2>
-            <p className="text-sm text-muted-foreground mt-1">Track gold, silver, oil & more</p>
-          </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/commodities">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
-          </Button>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {MOCK_COMMODITIES.map((c, i) => (
-            <motion.div
-              key={c.name}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="glass-card-hover p-4"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Gem className="h-4 w-4 text-chart-3" />
-                <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                <span className={`ml-auto text-xs font-medium ${c.change >= 0 ? "text-gain" : "text-loss"}`}>
-                  {c.change >= 0 ? "+" : ""}{c.change}%
-                </span>
-              </div>
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-lg font-bold text-foreground">{c.price.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">{c.unit}</p>
-                </div>
-                <Sparkline data={c.data} positive={c.change >= 0} width={60} height={24} />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Education Preview */}
+      {/* Feature Cards Grid */}
       <section className="mx-auto max-w-7xl px-4 pb-20">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-foreground">Start Learning</h2>
-            <p className="text-sm text-muted-foreground mt-1">Beginner-friendly financial education</p>
-          </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/education">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
-          </Button>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {EDUCATION_TOPICS.slice(0, 4).map((topic, i) => (
-            <motion.div
-              key={topic.title}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="glass-card-hover p-5 group cursor-pointer"
-            >
-              <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${topic.color} mb-3 text-2xl`}>
-                {topic.icon}
-              </div>
-              <h3 className="text-sm font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">{topic.title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{topic.desc}</p>
-            </motion.div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, i) => (
+            <FeatureCard key={feature.path} {...feature} index={i} />
           ))}
         </div>
       </section>

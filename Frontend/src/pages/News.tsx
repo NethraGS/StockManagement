@@ -1,63 +1,184 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { MOCK_NEWS } from "@/data/mockData";
-import { Clock, ExternalLink } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { fetchNews, type NewsArticle } from "@/services/newsApi";
+import NewsCard from "@/components/NewsCard";
+import { Newspaper, RefreshCw, AlertCircle, Loader2 } from "lucide-react";
 
-const categoryColor: Record<string, string> = {
-  Markets: "bg-chart-1/10 text-chart-1",
-  Economy: "bg-chart-2/10 text-chart-2",
-  Stocks: "bg-chart-3/10 text-chart-3",
-  Global: "bg-chart-4/10 text-chart-4",
-};
+/* ── Constants ──────────────────────────────────────────── */
+const CATEGORIES = ["All", "Markets", "Economy", "Stocks", "Global"] as const;
+type Category = (typeof CATEGORIES)[number];
 
-const News = () => {
+const PAGE_SIZE = 10;
+const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 minutes
+
+/* ── Page ───────────────────────────────────────────────── */
+
+const News: React.FC = () => {
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [category, setCategory] = useState<Category>("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+
+  // Debounce ref for category switching
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* ── Fetch ─────────────────────────────────────────────── */
+  const loadNews = useCallback(
+    async (cat: Category, showLoader = true) => {
+      if (showLoader) setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchNews(cat === "All" ? undefined : cat);
+        setArticles(data);
+        setLastRefresh(new Date());
+      } catch {
+        setError("Failed to fetch news. Showing cached results.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  // Initial load
+  useEffect(() => {
+    loadNews(category);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-refresh every 5 min
+  useEffect(() => {
+    const timer = setInterval(() => loadNews(category, false), AUTO_REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [category, loadNews]);
+
+  /* ── Category switch (debounced) ───────────────────────── */
+  const handleCategoryChange = (cat: Category) => {
+    if (cat === category) return;
+    setCategory(cat);
+    setVisibleCount(PAGE_SIZE);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => loadNews(cat), 200);
+  };
+
+  const visibleArticles = articles.slice(0, visibleCount);
+  const hasMore = visibleCount < articles.length;
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-3xl font-bold text-foreground mb-2">Market News</h1>
-        <p className="text-muted-foreground mb-8">Latest financial news and market updates</p>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-chart-4/10">
+              <Newspaper className="h-5 w-5 text-chart-4" />
+            </div>
+            <h1 className="font-display text-3xl font-bold text-foreground">Market News</h1>
+          </div>
+          {/* Manual refresh */}
+          <button
+            onClick={() => loadNews(category)}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        </div>
+        <div className="flex items-center gap-4 mb-6">
+          <p className="text-muted-foreground text-sm">Real-time financial news and market updates</p>
+          {lastRefresh && (
+            <span className="text-[10px] text-muted-foreground/60 hidden sm:inline">
+              Updated {lastRefresh.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
+        </div>
       </motion.div>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto">
-        {["All", "Markets", "Economy", "Stocks", "Global"].map((cat) => (
+      {/* Category filter bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="flex gap-2 mb-6 overflow-x-auto pb-1"
+      >
+        {CATEGORIES.map((cat) => (
           <button
             key={cat}
-            className="whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => handleCategoryChange(cat)}
+            className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+              category === cat
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+            }`}
           >
             {cat}
           </button>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="space-y-3">
-        {MOCK_NEWS.map((news, i) => (
-          <motion.article
-            key={i}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="glass-card-hover p-5 group cursor-pointer"
+      {/* Error banner */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 flex items-center gap-2 rounded-lg bg-loss/10 px-4 py-3 text-xs text-loss"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${categoryColor[news.category] || ""}`}>
-                    {news.category}
-                  </span>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> {news.time}
-                  </span>
-                </div>
-                <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
-                  {news.title}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">{news.source}</p>
-              </div>
-              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-1" />
-            </div>
-          </motion.article>
-        ))}
-      </div>
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Loading state */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-3">
+          <Loader2 className="h-8 w-8 text-primary animate-spin" />
+          <p className="text-sm text-muted-foreground">Fetching latest news…</p>
+        </div>
+      ) : articles.length === 0 ? (
+        /* Empty state */
+        <div className="flex flex-col items-center justify-center py-24 gap-3">
+          <Newspaper className="h-12 w-12 text-muted-foreground/20" />
+          <p className="text-sm text-muted-foreground">
+            No {category !== "All" ? category : ""} news found
+          </p>
+        </div>
+      ) : (
+        /* Article list */
+        <>
+          <div className="space-y-3">
+            {visibleArticles.map((article, i) => (
+              <NewsCard key={`${article.url}-${i}`} article={article} index={i} />
+            ))}
+          </div>
+
+          {/* Load More */}
+          {hasMore && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center mt-6"
+            >
+              <button
+                onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                className="rounded-xl border border-border px-6 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                Load More ({articles.length - visibleCount} remaining)
+              </button>
+            </motion.div>
+          )}
+
+          {/* Article count */}
+          <p className="text-center text-[11px] text-muted-foreground/50 mt-4">
+            Showing {visibleArticles.length} of {articles.length} articles
+          </p>
+        </>
+      )}
     </div>
   );
 };

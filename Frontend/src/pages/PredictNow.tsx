@@ -1,47 +1,56 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Brain, TrendingUp, TrendingDown, Activity, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Sparkline from "@/components/Sparkline";
+import { Brain, Activity, Zap } from "lucide-react";
+import StockSelector, { YearSelector } from "@/components/StockSelector";
+import PredictResultCard from "@/components/PredictResultCard";
+import StockCard from "@/components/StockCard";
+import { fetchPrediction } from "@/services/predictApi";
+import type { PredictResponse } from "@/services/predictApi";
 
-const stocks = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "SBIN", "ITC", "BHARTIARTL", "WIPRO", "TATAMOTORS"];
+/* ── constants ──────────────────────────────────────────────── */
+
+const STOCKS = [
+  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
+  "SBIN", "ITC", "BHARTIARTL", "WIPRO", "TATAMOTORS",
+];
+const YEARS = [5, 10, 12, 15];
+
+const STOCK_PRICES: Record<string, { price: number; change: number; name: string }> = {
+  RELIANCE: { price: 2876.50, change: 1.42, name: "Reliance Industries" },
+  TCS: { price: 4125.80, change: 0.85, name: "Tata Consultancy" },
+  INFY: { price: 1542.60, change: 2.10, name: "Infosys" },
+  HDFCBANK: { price: 1685.30, change: -0.32, name: "HDFC Bank" },
+  ICICIBANK: { price: 1198.45, change: 0.67, name: "ICICI Bank" },
+  SBIN: { price: 842.90, change: -0.55, name: "State Bank of India" },
+  ITC: { price: 465.20, change: 0.91, name: "ITC Limited" },
+  BHARTIARTL: { price: 1620.40, change: 1.34, name: "Bharti Airtel" },
+  WIPRO: { price: 542.75, change: -0.88, name: "Wipro" },
+  TATAMOTORS: { price: 985.60, change: 2.45, name: "Tata Motors" },
+};
+
+/* ── page ───────────────────────────────────────────────────── */
 
 const PredictNow = () => {
-  const [selected, setSelected] = useState("");
-  const [prediction, setPrediction] = useState<null | {
-    trend: "bullish" | "bearish";
-    confidence: number;
-    currentPrice: number;
-    predictedPrice: number;
-    pastData: number[];
-    futureData: number[];
-  }>(null);
+  const [symbol, setSymbol] = useState("");
+  const [years, setYears] = useState(5);
+  const [result, setResult] = useState<PredictResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handlePredict = () => {
-    if (!selected) return;
+  const handlePredict = async () => {
+    if (!symbol) return;
     setLoading(true);
-    setTimeout(() => {
-      const isBullish = Math.random() > 0.4;
-      const base = 1500 + Math.random() * 3000;
-      const pastData = Array.from({ length: 20 }, (_, i) => base + (Math.random() - 0.5) * 100 + i * (isBullish ? 5 : -3));
-      const lastPrice = pastData[pastData.length - 1];
-      const futureData = Array.from({ length: 10 }, (_, i) => lastPrice + (isBullish ? 1 : -1) * (i * 8 + Math.random() * 20));
-
-      setPrediction({
-        trend: isBullish ? "bullish" : "bearish",
-        confidence: 60 + Math.floor(Math.random() * 30),
-        currentPrice: Math.round(lastPrice * 100) / 100,
-        predictedPrice: Math.round(futureData[futureData.length - 1] * 100) / 100,
-        pastData,
-        futureData,
-      });
+    setResult(null);
+    try {
+      const data = await fetchPrediction({ symbol, years });
+      setResult(data);
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3 mb-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-chart-2/10">
@@ -50,103 +59,57 @@ const PredictNow = () => {
           <h1 className="font-display text-3xl font-bold text-foreground">AI Predict</h1>
           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-chart-2/10 text-chart-2">Beta</span>
         </div>
-        <p className="text-muted-foreground mb-8">AI-powered stock trend prediction — for educational purposes only</p>
+        <p className="text-muted-foreground mb-8">
+          AI-powered stock trend prediction — for educational purposes only
+        </p>
       </motion.div>
 
-      <div className="glass-card p-6 mb-6">
-        <p className="text-sm font-medium text-foreground mb-3">Select a stock</p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {stocks.map((s) => (
-            <button
-              key={s}
-              onClick={() => { setSelected(s); setPrediction(null); }}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                selected === s ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-        <Button variant="hero" onClick={handlePredict} disabled={!selected || loading} className="w-full sm:w-auto">
+      {/* Selection panel */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="rounded-2xl border border-border bg-card/60 backdrop-blur-md p-6 space-y-5 mb-6"
+      >
+        <StockSelector stocks={STOCKS} selected={symbol} onSelect={(s) => { setSymbol(s); setResult(null); }} />
+        <YearSelector years={YEARS} selected={years} onSelect={setYears} />
+
+        <button
+          onClick={handlePredict}
+          disabled={!symbol || loading}
+          className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground
+                     transition-all duration-200 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed
+                     shadow-lg shadow-primary/20"
+        >
           {loading ? (
-            <span className="flex items-center gap-2"><Activity className="h-4 w-4 animate-pulse" /> Analyzing...</span>
+            <>
+              <Activity className="h-4 w-4 animate-pulse" />
+              Analyzing…
+            </>
           ) : (
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4" /> Predict Now</span>
+            <>
+              <Zap className="h-4 w-4" />
+              Predict Now
+            </>
           )}
-        </Button>
-      </div>
+        </button>
+      </motion.div>
 
-      {prediction && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="glass-card p-5 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Sentiment</p>
-              <div className="flex items-center justify-center gap-2">
-                {prediction.trend === "bullish" ? (
-                  <TrendingUp className="h-6 w-6 text-gain" />
-                ) : (
-                  <TrendingDown className="h-6 w-6 text-loss" />
-                )}
-                <span className={`text-xl font-bold capitalize ${prediction.trend === "bullish" ? "text-gain" : "text-loss"}`}>
-                  {prediction.trend}
-                </span>
-              </div>
-            </div>
-            <div className="glass-card p-5 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Confidence</p>
-              <p className="text-3xl font-bold text-primary">{prediction.confidence}%</p>
-              <div className="mt-2 h-2 rounded-full bg-secondary overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${prediction.confidence}%` }}
-                  className="h-full rounded-full bg-primary"
-                  transition={{ duration: 0.8 }}
-                />
-              </div>
-            </div>
-            <div className="glass-card p-5 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Predicted Price</p>
-              <p className={`text-2xl font-bold ${prediction.trend === "bullish" ? "text-gain" : "text-loss"}`}>
-                ₹{prediction.predictedPrice.toLocaleString()}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Current: ₹{prediction.currentPrice.toLocaleString()}
-              </p>
-            </div>
+      {/* Result card */}
+      {result && <PredictResultCard data={result} symbol={symbol} />}
+
+      {/* Trade the predicted stock */}
+      {result && symbol && STOCK_PRICES[symbol] && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3">Trade {symbol}</h2>
+          <div className="max-w-sm">
+            <StockCard
+              symbol={symbol}
+              name={STOCK_PRICES[symbol].name}
+              price={STOCK_PRICES[symbol].price}
+              change={STOCK_PRICES[symbol].change}
+            />
           </div>
-
-          <div className="glass-card p-6">
-            <p className="text-sm font-semibold text-foreground mb-4">Price Trend — Past vs Predicted</p>
-            <div className="flex items-end gap-1 h-32">
-              {[...prediction.pastData, ...prediction.futureData].map((v, i) => {
-                const all = [...prediction.pastData, ...prediction.futureData];
-                const min = Math.min(...all);
-                const max = Math.max(...all);
-                const height = ((v - min) / (max - min)) * 100;
-                const isFuture = i >= prediction.pastData.length;
-                return (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-t transition-all ${
-                      isFuture
-                        ? prediction.trend === "bullish" ? "bg-gain/40" : "bg-loss/40"
-                        : "bg-primary/30"
-                    }`}
-                    style={{ height: `${Math.max(height, 2)}%` }}
-                  />
-                );
-              })}
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>Past 20 days</span>
-              <span className="text-primary">← Predicted →</span>
-            </div>
-          </div>
-
-          <p className="text-xs text-muted-foreground text-center">
-            ⚠️ This is a simulated prediction for educational purposes. Not financial advice.
-          </p>
         </motion.div>
       )}
     </div>
