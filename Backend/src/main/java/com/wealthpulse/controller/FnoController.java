@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/fno")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost:8081"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080", "http://localhost:8081"})
 public class FnoController {
 
     private final FnoService fnoService;

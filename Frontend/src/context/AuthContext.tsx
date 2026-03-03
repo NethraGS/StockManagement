@@ -21,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const TOKEN_KEY = "wealthpulse_token";
 const USER_KEY  = "wealthpulse_user";
+const API_BASE = ((import.meta as any).env?.VITE_API_BASE_URL as string) || ((import.meta as any).env?.VITE_API_URL as string) || "";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated(true);
 
         /* Optionally verify token is still valid */
-        fetch("/api/auth/me", {
+        fetch(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${storedToken}` },
         })
           .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
@@ -77,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /* ── LOGIN ── */
   const login = useCallback(async (email: string, password: string): Promise<{ ok: boolean; message: string }> => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -98,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /* ── SIGNUP ── */
   const signup = useCallback(async (name: string, email: string, password: string): Promise<{ ok: boolean; message: string }> => {
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(`${API_BASE}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
