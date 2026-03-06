@@ -119,6 +119,11 @@ public class FnoService {
     private FnoSummaryResponse parseNseJson(String symbol, String json) throws Exception {
         JsonNode root = mapper.readTree(json);
         JsonNode records = root.path("records");
+        // Validate expected structure — if NSE returned HTML/error page, bail out so fallback is used
+        JsonNode dataNode = records.path("data");
+        if (records.isMissingNode() || dataNode.isMissingNode() || !dataNode.isArray() || dataNode.size() == 0) {
+            throw new RuntimeException("Unexpected NSE JSON structure: missing records.data");
+        }
         JsonNode data = records.path("data");
 
         double spotPrice = 0;
