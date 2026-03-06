@@ -1,0 +1,100 @@
+-- MySQL schema for wealthpulse
+
+CREATE DATABASE IF NOT EXISTS wealthpulse;
+USE wealthpulse;
+
+-- USERS
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  full_name VARCHAR(255),
+  username VARCHAR(100) UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  phone_number VARCHAR(50),
+  password VARCHAR(255) NOT NULL,
+  client_id VARCHAR(255),
+  demat_id VARCHAR(255),
+  pan_number VARCHAR(50),
+  kyc_status VARCHAR(20) DEFAULT 'NOT_STARTED',
+  bank_name VARCHAR(255),
+  bank_account_number VARCHAR(100),
+  ifsc_code VARCHAR(50),
+  portfolio_value DECIMAL(24,8) DEFAULT 0,
+  total_invested DECIMAL(24,8) DEFAULT 0,
+  total_profit_loss DECIMAL(24,8) DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_login DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- WATCHLISTS
+CREATE TABLE IF NOT EXISTS watchlists (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  name VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- WATCHLIST ITEMS
+CREATE TABLE IF NOT EXISTS watchlist_items (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  watchlist_id BIGINT NOT NULL,
+  symbol VARCHAR(50),
+  exchange VARCHAR(50),
+  company_name VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (watchlist_id) REFERENCES watchlists(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- PORTFOLIOS
+CREATE TABLE IF NOT EXISTS portfolios (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  name VARCHAR(255),
+  base_currency VARCHAR(10),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- HOLDINGS
+CREATE TABLE IF NOT EXISTS holdings (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  portfolio_id BIGINT NOT NULL,
+  symbol VARCHAR(50),
+  company_name VARCHAR(255),
+  quantity DOUBLE,
+  avg_buy_price DECIMAL(24,8),
+  current_price DECIMAL(24,8),
+  total_value DECIMAL(24,8),
+  profit_loss DECIMAL(24,8),
+  last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- TRANSACTIONS
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  portfolio_id BIGINT NOT NULL,
+  symbol VARCHAR(50),
+  company_name VARCHAR(255),
+  txn_type VARCHAR(10),
+  quantity DOUBLE,
+  price DECIMAL(24,8),
+  fees DECIMAL(24,8),
+  txn_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  notes TEXT,
+  FOREIGN KEY (portfolio_id) REFERENCES portfolios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- PRICE ALERTS
+CREATE TABLE IF NOT EXISTS price_alerts (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  symbol VARCHAR(50),
+  company_name VARCHAR(255),
+  condition_type VARCHAR(10),
+  target_price DECIMAL(24,8),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

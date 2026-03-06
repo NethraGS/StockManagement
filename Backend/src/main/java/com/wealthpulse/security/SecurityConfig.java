@@ -47,7 +47,13 @@ public class SecurityConfig {
                     "/h2-console/**"
                 ).permitAll()
                 /* Protected — requires valid JWT */
-                .requestMatchers("/api/user/**").authenticated()
+                .requestMatchers(
+                    "/api/user/**",
+                    "/api/watchlists/**",
+                    "/api/portfolio/**",
+                    "/api/transactions/**",
+                    "/api/alerts/**"
+                ).authenticated()
                 /* Everything else — permit (frontend routes, static) */
                 .anyRequest().permitAll()
             )
@@ -72,7 +78,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://localhost:8080",
+                "http://localhost:3000",
                 "http://localhost:8080"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

@@ -3,7 +3,7 @@
  *  Backend caches NSE data for 60 s → no IP-ban risk.
  * ──────────────────────────────────────────────────────── */
 
-const BASE = "http://localhost:8080/api/fno";
+const BASE = "/api/fno";
 
 /* ── Types ────────────────────────────────────────────── */
 export interface OptionContract {
