@@ -22,6 +22,7 @@ import PredictNow from "./pages/PredictNow";
 import Dashboard from "./pages/Dashboard";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
+import Footer from "./components/ui/footer";
 
 const queryClient = new QueryClient();
 
@@ -32,40 +33,52 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Navbar />
-            <AuthModal />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/indices" element={<Indices />} />
-              <Route path="/indices/:indexName" element={<IndexDetail />} />
-              <Route path="/fno" element={<FAndO />} />
-              <Route path="/crypto" element={<Crypto />} />
-              <Route path="/mutual-funds" element={<MutualFunds />} />
-              <Route path="/commodities" element={<Commodities />} />
-              <Route path="/education" element={<Education />} />
-              <Route path="/calculators" element={<Calculators />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/predict" element={<PredictNow />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/portfolio"
-                element={
-                  <ProtectedRoute>
-                    <Portfolio />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+         <BrowserRouter>
+  <div className="flex flex-col min-h-screen">
+    
+    <Navbar />
+    <AuthModal />
+
+    <main className="flex-1">
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/indices" element={<Indices />} />
+        <Route path="/indices/:indexName" element={<IndexDetail />} />
+        <Route path="/fno" element={<FAndO />} />
+        <Route path="/crypto" element={<Crypto />} />
+        <Route path="/mutual-funds" element={<MutualFunds />} />
+        <Route path="/commodities" element={<Commodities />} />
+        <Route path="/education" element={<Education />} />
+        <Route path="/calculators" element={<Calculators />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/predict" element={<PredictNow />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/portfolio"
+          element={
+            <ProtectedRoute>
+              <Portfolio />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </main>
+
+    <Footer />
+
+  </div>
+</BrowserRouter>
         </TooltipProvider>
       </PortfolioProvider>
     </AuthProvider>
