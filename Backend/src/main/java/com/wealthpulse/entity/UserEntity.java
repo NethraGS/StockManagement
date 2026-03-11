@@ -6,6 +6,10 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 4b1e33e9a1752ed9de2db037f8f09501dd5ca710
 @Entity
 @Table(name = "users")
 @Getter

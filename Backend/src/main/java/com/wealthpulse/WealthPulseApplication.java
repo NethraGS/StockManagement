@@ -19,6 +19,20 @@ public class WealthPulseApplication {
         return new RestTemplate();
     }
 
+<<<<<<< HEAD
+    // @Bean
+    // public WebMvcConfigurer corsConfigurer() {
+    //     return new WebMvcConfigurer() {
+    //         @Override
+    //         public void addCorsMappings(CorsRegistry registry) {
+    //             registry.addMapping("/api/**")
+    //                     .allowedOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:8080")
+    //                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+    //                     .allowedHeaders("*");
+    //         }
+    //     };
+    // }
+=======
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -31,4 +45,5 @@ public class WealthPulseApplication {
             }
         };
     }
+>>>>>>> 4b1e33e9a1752ed9de2db037f8f09501dd5ca710
 }

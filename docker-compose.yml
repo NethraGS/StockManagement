@@ -28,6 +28,11 @@ services:
 
   frontend:
     image: nethra0303/wealthpulse-frontend:latest
+    build:
+      context: ./Frontend
+      args:
+        VITE_API_BASE_URL:  "http://3.238.245.228:8080"
+        VITE_API_URL: "http://3.238.245.228:8080"
     container_name: wealthpulse-frontend
     restart: always
     ports:
