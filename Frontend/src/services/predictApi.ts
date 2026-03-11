@@ -17,7 +17,7 @@ export interface PredictResponse {
   volatility: number;  // daily return std-dev
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://100.53.25.60:8080";
 
 /**
  * Call the Spring Boot EMA + volatility prediction pipeline.

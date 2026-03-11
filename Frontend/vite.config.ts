@@ -13,12 +13,12 @@ export default defineConfig(({ mode }) => ({
     },
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://100.53.25.60:8080",
         changeOrigin: true,
         secure: false,
       },
       "/h2-console": {
-        target: "http://localhost:8080",
+        target: "http://100.53.25.60:8080",
         changeOrigin: true,
       },
     },
