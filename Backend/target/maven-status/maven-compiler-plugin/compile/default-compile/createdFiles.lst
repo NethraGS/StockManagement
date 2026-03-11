@@ -25,6 +25,7 @@ com\wealthpulse\dto\NewsResponse.class
 com\wealthpulse\service\CryptoService$CoinMeta.class
 com\wealthpulse\service\GeminiService.class
 com\wealthpulse\service\MarketService$CacheEntry.class
+com\wealthpulse\config\CorsConfig.class
 com\wealthpulse\service\CryptoService.class
 com\wealthpulse\service\HistoricalDataService$CacheEntry.class
 com\wealthpulse\dto\OptionContractResponse.class
@@ -33,7 +34,6 @@ com\wealthpulse\service\FnoService.class
 com\wealthpulse\service\MarketService.class
 com\wealthpulse\service\AuthService.class
 com\wealthpulse\dto\LoginRequest.class
-com\wealthpulse\WealthPulseApplication$1.class
 com\wealthpulse\service\SentimentService.class
 com\wealthpulse\controller\FnoController.class
 com\wealthpulse\service\CryptoService$CacheEntry.class

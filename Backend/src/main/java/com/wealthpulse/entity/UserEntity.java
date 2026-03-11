@@ -3,9 +3,7 @@ package com.wealthpulse.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * User entity — maps to the USERS table in H2.
- */
+
 @Entity
 @Table(name = "users")
 public class UserEntity {
