@@ -12,7 +12,7 @@ export interface TickerItem {
   percentChange: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://100.53.25.60:8080";
 
 /**
  * Fetch ticker data from backend. Falls back to mock data on failure.

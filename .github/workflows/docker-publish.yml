@@ -43,8 +43,8 @@ jobs:
           context: ./Frontend
           push: true
           build-args: |
-            VITE_API_BASE_URL=http://localhost:8080
-            VITE_API_URL=http://localhost:8080
+            VITE_API_BASE_URL=http://100.53.25.60:8080
+            VITE_API_URL=http://100.53.25.60:8080
           tags: |
             nethra0303/wealthpulse-frontend:latest
             nethra0303/wealthpulse-frontend:${{ github.sha }}
