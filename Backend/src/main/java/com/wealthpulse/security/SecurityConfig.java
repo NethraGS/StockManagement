@@ -47,7 +47,13 @@ public class SecurityConfig {
                     "/h2-console/**"
                 ).permitAll()
                 /* Protected — requires valid JWT */
-                .requestMatchers("/api/user/**").authenticated()
+                .requestMatchers(
+                    "/api/user/**",
+                    "/api/watchlists/**",
+                    "/api/portfolio/**",
+                    "/api/transactions/**",
+                    "/api/alerts/**"
+                ).authenticated()
                 /* Everything else — permit (frontend routes, static) */
                 .anyRequest().permitAll()
             )
