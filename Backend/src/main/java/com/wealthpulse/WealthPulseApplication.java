@@ -19,7 +19,7 @@ public class WealthPulseApplication {
         return new RestTemplate();
     }
 
-<<<<<<< HEAD
+
     // @Bean
     // public WebMvcConfigurer corsConfigurer() {
     //     return new WebMvcConfigurer() {
@@ -32,7 +32,6 @@ public class WealthPulseApplication {
     //         }
     //     };
     // }
-=======
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -45,5 +44,5 @@ public class WealthPulseApplication {
             }
         };
     }
->>>>>>> 4b1e33e9a1752ed9de2db037f8f09501dd5ca710
+
 }
