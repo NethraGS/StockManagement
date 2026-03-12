@@ -22,6 +22,7 @@ import PredictNow from "./pages/PredictNow";
 import Dashboard from "./pages/Dashboard";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
