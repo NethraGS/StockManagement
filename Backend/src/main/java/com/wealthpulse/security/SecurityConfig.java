@@ -43,6 +43,7 @@ public class SecurityConfig {
                     "/api/fno/**",
                     "/api/news/**",
                     "/api/ai/**",
+                    "/api/footer/**",
                     "/api/predict/**",
                     "/h2-console/**"
                 ).permitAll()
